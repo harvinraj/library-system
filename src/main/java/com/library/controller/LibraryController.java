@@ -25,6 +25,12 @@ public class LibraryController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
+    @GetMapping ("/borrowers")
+    public ResponseEntity<List<BorrowerResponseDTO>> getAllBorrowers() {
+        List<BorrowerResponseDTO> borrowers = libraryService.getAllBorrowers();
+        return ResponseEntity.ok(borrowers);
+    }
+
     @PostMapping("/books")
     public ResponseEntity<BookCopyResponseDTO> registerBook(@Valid @RequestBody BookRegistrationDTO request) {
         BookCopyResponseDTO response = libraryService.registerBook(request.isbn(), request.title(), request.author());

@@ -4,7 +4,7 @@ import com.library.dto.BookCopyResponseDTO;
 import com.library.dto.BorrowerResponseDTO;
 import com.library.dto.BookLoanResponseDTO;
 import com.library.exception.BookNotAvailableException;
-import com.library.exception.InvalidIsbnException;
+import com.library.exception.InvalidException;
 import com.library.model.*;
 import com.library.repository.BookCatalogRepository;
 import com.library.repository.BookCopyRepository;
@@ -76,7 +76,7 @@ class LibraryServiceTest {
         when(borrowerRepository.findByEmail(anyString())).thenReturn(Optional.of(sampleBorrower));
 
         assertThatThrownBy(() -> libraryService.registerBorrower("Alice Smith", "alice@example.com"))
-                .isInstanceOf(InvalidIsbnException.class)
+                .isInstanceOf(InvalidException.class)
                 .hasMessageContaining("already exists");
 
         verify(borrowerRepository, never()).save(any(Borrower.class));
@@ -100,7 +100,7 @@ class LibraryServiceTest {
         when(bookCatalogRepository.findById(anyString())).thenReturn(Optional.of(sampleCatalog));
 
         assertThatThrownBy(() -> libraryService.registerBook("978-0132350884", "Different Title", "Robert C. Martin"))
-                .isInstanceOf(InvalidIsbnException.class)
+                .isInstanceOf(InvalidException.class)
                 .hasMessageContaining("already exists with different title/author");
 
         verify(bookCopyRepository, never()).save(any(BookCopy.class));

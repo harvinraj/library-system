@@ -4,7 +4,7 @@ import com.library.dto.BookCopyResponseDTO;
 import com.library.dto.BorrowerResponseDTO;
 import com.library.dto.BookLoanResponseDTO;
 import com.library.exception.BookNotAvailableException;
-import com.library.exception.InvalidIsbnException;
+import com.library.exception.InvalidException;
 import com.library.exception.ResourceNotFoundException;
 import com.library.model.*;
 import com.library.repository.BookCatalogRepository;
@@ -46,7 +46,7 @@ public class LibraryService {
 
         borrowerRepository.findByEmail(email).ifPresent(b -> {
             log.error("Failed to register borrower: Email {} already exists.", email);
-            throw new InvalidIsbnException("Borrower with email " + email + " already exists.");
+            throw new InvalidException("Borrower with email " + email + " already exists.");
         });
 
         Borrower borrower = borrowerRepository.save(new Borrower(name, email));
@@ -66,7 +66,7 @@ public class LibraryService {
             catalog = existingCatalog.get();
             if (!catalog.getTitle().equalsIgnoreCase(title) || !catalog.getAuthor().equalsIgnoreCase(author)) {
                 log.error("Failed to register book: ISBN {} exists with different title/author.", isbn);
-                throw new InvalidIsbnException("ISBN " + isbn + " already exists with different title/author.");
+                throw new InvalidException("ISBN " + isbn + " already exists with different title/author.");
             }
             log.info("Found existing book catalog for ISBN: {}. Adding new book copy.", isbn);
         } else {
@@ -81,8 +81,23 @@ public class LibraryService {
         return new BookCopyResponseDTO(copy.getId(), catalog.getIsbn(), catalog.getTitle(), catalog.getAuthor(), copy.getStatus());
     }
 
+    public List<BorrowerResponseDTO> getAllBorrowers() {
+        log.info("Fetching all registered borrowers.");
+
+        List<BorrowerResponseDTO> borrowers = borrowerRepository.findAll().stream()
+                .map(borrower -> new BorrowerResponseDTO(
+                    borrower.getId(), 
+                    borrower.getName(), 
+                    borrower.getEmail()
+                ))
+                .toList();
+        log.info("Retrieved {} borrowers.", borrowers.size());
+        return borrowers;
+    }
+
     public List<BookCopyResponseDTO> getAllBooks() {
         log.info("Fetching all book copies from book catalog.");
+
         List<BookCopyResponseDTO> bookCopies = bookCopyRepository.findAll().stream()
                 .map(copy -> new BookCopyResponseDTO(
                         copy.getId(),
