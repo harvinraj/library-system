@@ -4,7 +4,7 @@ A production-grade, concurrency-safe RESTful API for managing a library system, 
 
 ---
 
-## Table of Contents
+## 📋 Table of Contents
 1. [Architecture & Design Decisions](#architecture--design-decisions)
 2. [Database Choice Justification](#database-choice-justification)
 3. [Project Assumptions](#project-assumptions)
@@ -16,7 +16,7 @@ A production-grade, concurrency-safe RESTful API for managing a library system, 
 
 ---
 
-## Architecture & Design Decisions
+## 🏗️ Architecture & Design Decisions
 
 ### 1. Book Catalog vs. Physical Book Copy Separation
 To satisfy the requirement that multiple physical copies of the same book share an ISBN while maintaining unique IDs and independent borrowing states, the domain model separates metadata from inventory:
@@ -33,7 +33,7 @@ All exceptions are intercepted centrally via `@RestControllerAdvice` and seriali
 
 ---
 
-## Database Choice Justification
+## 🗄️ Database Choice Justification
 
 **PostgreSQL** was chosen as the primary relational database for the following reasons:
 1. **Strict ACID Compliance:** Essential for transactional integrity when updating book availability status and creating loan records atomically.
@@ -42,7 +42,7 @@ All exceptions are intercepted centrally via `@RestControllerAdvice` and seriali
 
 ---
 
-## Project Assumptions
+## 💡 Project Assumptions
 
 1. **ISBN Immutability & Normalization:** Once an ISBN is registered with a specific `title` and `author`, any subsequent registration using that same ISBN must match the existing title and author (case-insensitive). Attempting to register the same ISBN with conflicting metadata throws a `400 Bad Request` (`InvalidException`).
 2. **Same Title/Author with Different ISBNs:** Treated as completely distinct book editions in `BookCatalog`, per specification.
@@ -52,7 +52,7 @@ All exceptions are intercepted centrally via `@RestControllerAdvice` and seriali
 
 ---
 
-## 12-Factor App & Clean Code Conformance
+## 🌟 12-Factor App & Clean Code Conformance
 
 * **Codebase & Dependencies:** Managed declaratively via standard build tools (`pom.xml` / `build.gradle`) with isolated dependencies.
 * **Configuration (`application.yaml`):** Hierarchical YAML configuration supporting environment variable overrides (`SPRING_DATASOURCE_URL`, etc.) for seamless deployment across local, staging, and production environments.
@@ -62,7 +62,7 @@ All exceptions are intercepted centrally via `@RestControllerAdvice` and seriali
 
 ---
 
-## Getting Started & Containerization
+## 🚀 Getting Started & Containerization
 
 ### Prerequisites
 * Docker & Docker Compose
@@ -83,7 +83,7 @@ The API will be available at `http://localhost:8080`.
 
 ---
 
-## Database Seeding
+## 🌱 Database Seeding
 
 On startup, `DatabaseSeeder` automatically populates the database (if empty) with initial test data so you can test endpoints immediately:
 * **2 Borrowers:**
@@ -105,7 +105,7 @@ On startup, `DatabaseSeeder` automatically populates the database (if empty) wit
 
 ---
 
-## API Documentation & Usage Examples
+## 📖 API Documentation & Usage Examples
 
 ### 1. Register a New Borrower
 * **Endpoint:** `POST /api/v1/library/borrowers`
@@ -264,7 +264,7 @@ When validation fails or a book copy is already borrowed:
 
 ---
 
-## Testing & Concurrency Verification
+## 🧪 Testing & Concurrency Verification
 
 Run the automated test suite using Maven/Gradle:
 ```bash
