@@ -7,7 +7,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,7 +18,6 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleResourceNotFound(ResourceNotFoundException ex) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
         problemDetail.setTitle("Resource Not Found");
-        problemDetail.setType(URI.create("https://api.library.com/errors/not-found"));
         problemDetail.setProperty("timestamp", LocalDateTime.now());
         return problemDetail;
     }
@@ -28,7 +26,6 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleBusinessRuleViolation(RuntimeException ex) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
         problemDetail.setTitle("Business Rule Violation");
-        problemDetail.setType(URI.create("https://api.library.com/errors/bad-request"));
         problemDetail.setProperty("timestamp", LocalDateTime.now());
         return problemDetail;
     }
@@ -42,7 +39,6 @@ public class GlobalExceptionHandler {
 
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Validation failed for request payload");
         problemDetail.setTitle("Invalid Request Parameters");
-        problemDetail.setType(URI.create("https://api.library.com/errors/validation"));
         problemDetail.setProperty("errors", errors);
         problemDetail.setProperty("timestamp", LocalDateTime.now());
         return problemDetail;
