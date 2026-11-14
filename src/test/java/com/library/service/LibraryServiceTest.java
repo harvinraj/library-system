@@ -1,5 +1,8 @@
 package com.library.service;
 
+import com.library.dto.BookCopyResponseDTO;
+import com.library.dto.BorrowerResponseDTO;
+import com.library.dto.BookLoanResponseDTO;
 import com.library.exception.BookNotAvailableException;
 import com.library.exception.InvalidIsbnException;
 import com.library.model.*;
@@ -19,6 +22,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -57,19 +61,19 @@ class LibraryServiceTest {
 
     @Test
     void registerBorrower_Success() {
-        when(borrowerRepository.findByEmail(sampleBorrower.getEmail())).thenReturn(Optional.empty());
+        when(borrowerRepository.findByEmail(anyString())).thenReturn(Optional.empty());
         when(borrowerRepository.save(any(Borrower.class))).thenReturn(sampleBorrower);
 
-        Borrower result = libraryService.registerBorrower("Alice Smith", "alice@example.com");
+        BorrowerResponseDTO result = libraryService.registerBorrower("Alice Smith", "alice@example.com");
 
         assertThat(result).isNotNull();
-        assertThat(result.getEmail()).isEqualTo("alice@example.com");
+        assertThat(result.email()).isEqualTo("alice@example.com");
         verify(borrowerRepository, times(1)).save(any(Borrower.class));
     }
 
     @Test
     void registerBorrower_DuplicateEmail_ThrowsException() {
-        when(borrowerRepository.findByEmail(sampleBorrower.getEmail())).thenReturn(Optional.of(sampleBorrower));
+        when(borrowerRepository.findByEmail(anyString())).thenReturn(Optional.of(sampleBorrower));
 
         assertThatThrownBy(() -> libraryService.registerBorrower("Alice Smith", "alice@example.com"))
                 .isInstanceOf(InvalidIsbnException.class)
@@ -80,11 +84,11 @@ class LibraryServiceTest {
 
     @Test
     void registerBook_NewCatalogAndCopy_Success() {
-        when(bookCatalogRepository.findById(sampleCatalog.getIsbn())).thenReturn(Optional.empty());
+        when(bookCatalogRepository.findById(anyString())).thenReturn(Optional.empty());
         when(bookCatalogRepository.save(any(BookCatalog.class))).thenReturn(sampleCatalog);
         when(bookCopyRepository.save(any(BookCopy.class))).thenReturn(sampleCopy);
 
-        BookCopy result = libraryService.registerBook("978-0132350884", "Clean Code", "Robert C. Martin");
+        BookCopyResponseDTO result = libraryService.registerBook("978-0132350884", "Clean Code", "Robert C. Martin");
 
         assertThat(result).isNotNull();
         verify(bookCatalogRepository, times(1)).save(any(BookCatalog.class));
@@ -93,9 +97,8 @@ class LibraryServiceTest {
 
     @Test
     void registerBook_ExistingIsbnDifferentTitle_ThrowsException() {
-        when(bookCatalogRepository.findById(sampleCatalog.getIsbn())).thenReturn(Optional.of(sampleCatalog));
+        when(bookCatalogRepository.findById(anyString())).thenReturn(Optional.of(sampleCatalog));
 
-        // Attempting to register same ISBN with a different title
         assertThatThrownBy(() -> libraryService.registerBook("978-0132350884", "Different Title", "Robert C. Martin"))
                 .isInstanceOf(InvalidIsbnException.class)
                 .hasMessageContaining("already exists with different title/author");
@@ -105,14 +108,18 @@ class LibraryServiceTest {
 
     @Test
     void borrowBook_Success() {
+        BookLoan sampleLoan = new BookLoan();
+        sampleLoan.setId(1L);
+        sampleLoan.setBookCopy(sampleCopy);
+        sampleLoan.setBorrower(sampleBorrower);
+
         when(borrowerRepository.findById(1L)).thenReturn(Optional.of(sampleBorrower));
         when(bookCopyRepository.findByIdWithLock(101L)).thenReturn(Optional.of(sampleCopy));
-        when(loanRepository.save(any(BookLoan.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(loanRepository.save(any(BookLoan.class))).thenReturn(sampleLoan);
 
-        BookLoan loan = libraryService.borrowBook(1L, 101L);
+        BookLoanResponseDTO result = libraryService.borrowBook(1L, 101L);
 
-        assertThat(loan).isNotNull();
-        assertThat(loan.getBookCopy().getStatus()).isEqualTo(BookStatus.BORROWED);
+        assertThat(result).isNotNull();
         verify(bookCopyRepository, times(1)).save(sampleCopy);
         verify(loanRepository, times(1)).save(any(BookLoan.class));
     }

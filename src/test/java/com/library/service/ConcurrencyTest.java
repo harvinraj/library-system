@@ -49,7 +49,7 @@ public class ConcurrencyTest {
         borrowerRepository.deleteAll();
 
         // 1. Setup Catalog and Book Copy
-        BookCatalog catalog = bookCatalogRepository.save(new BookCatalog("978-0132350884", "Clean Code", "Robert C. Martin"));
+        BookCatalog catalog = bookCatalogRepository.save(new BookCatalog("978-0132350884", "Clean Code Concurrency", "Robert C. Martin"));
         BookCopy copy = bookCopyRepository.save(new BookCopy(catalog));
         testBookCopyId = copy.getId();
 

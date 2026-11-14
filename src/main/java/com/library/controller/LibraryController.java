@@ -1,11 +1,6 @@
 package com.library.controller;
 
-import com.library.dto.BookRegistrationDTO;
-import com.library.dto.BorrowRequestDTO;
-import com.library.dto.BorrowerRegistrationDTO;
-import com.library.model.BookCopy;
-import com.library.model.Borrower;
-import com.library.model.BookLoan;
+import com.library.dto.*;
 import com.library.service.LibraryService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -24,38 +19,33 @@ public class LibraryController {
         this.libraryService = libraryService;
     }
 
-    // 1. Register a new borrower
-    @PostMapping("/borrower")
-    public ResponseEntity<Borrower> registerBorrower(@Valid @RequestBody BorrowerRegistrationDTO request) {
-        Borrower borrower = libraryService.registerBorrower(request.name(), request.email());
-        return new ResponseEntity<>(borrower, HttpStatus.CREATED);
+    @PostMapping("/borrowers")
+    public ResponseEntity<BorrowerResponseDTO> registerBorrower(@Valid @RequestBody BorrowerRegistrationDTO request) {
+        BorrowerResponseDTO response = libraryService.registerBorrower(request.name(), request.email());
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    // 2. Register a new book
-    @PostMapping("/book")
-    public ResponseEntity<BookCopy> registerBook(@Valid @RequestBody BookRegistrationDTO request) {
-        BookCopy bookCopy = libraryService.registerBook(request.isbn(), request.title(), request.author());
-        return new ResponseEntity<>(bookCopy, HttpStatus.CREATED);
+    @PostMapping("/books")
+    public ResponseEntity<BookCopyResponseDTO> registerBook(@Valid @RequestBody BookRegistrationDTO request) {
+        BookCopyResponseDTO response = libraryService.registerBook(request.isbn(), request.title(), request.author());
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    // 3. Get a list of all books
     @GetMapping("/books")
-    public ResponseEntity<List<BookCopy>> getAllBooks() {
-        List<BookCopy> books = libraryService.getAllBooks();
+    public ResponseEntity<List<BookCopyResponseDTO>> getAllBooks() {
+        List<BookCopyResponseDTO> books = libraryService.getAllBooks();
         return ResponseEntity.ok(books);
     }
 
-    // 4. Borrow a book on behalf of a borrower
-    @PostMapping("/loan/borrow")
-    public ResponseEntity<BookLoan> borrowBook(@Valid @RequestBody BorrowRequestDTO request) {
-        BookLoan bookLoan = libraryService.borrowBook(request.borrowerId(), request.bookCopyId());
-        return new ResponseEntity<>(bookLoan, HttpStatus.CREATED);
+    @PostMapping("/loans/borrow")
+    public ResponseEntity<BookLoanResponseDTO> borrowBook(@Valid @RequestBody BorrowRequestDTO request) {
+        BookLoanResponseDTO response = libraryService.borrowBook(request.borrowerId(), request.bookCopyId());
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    // 5. Return a borrowed book
-    @PostMapping("/loan/return/{bookCopyId}")
-    public ResponseEntity<BookLoan> returnBook(@PathVariable Long bookCopyId) {
-        BookLoan bookLoan = libraryService.returnBook(bookCopyId);
-        return ResponseEntity.ok(bookLoan);
+    @PostMapping("/loans/return/{bookCopyId}")
+    public ResponseEntity<BookLoanResponseDTO> returnBook(@PathVariable Long bookCopyId) {
+        BookLoanResponseDTO response = libraryService.returnBook(bookCopyId);
+        return ResponseEntity.ok(response);
     }
 }
